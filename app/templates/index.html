@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Personal Expense Tracker</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%2310262B'/><path d='M8 22V10h5a4 4 0 010 8H8' fill='none' stroke='%23E3B04B' stroke-width='3'/></svg>">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <h1>Personal Expense Tracker</h1>
+      <p>Track. Analyze. Manage.</p>
+    </div>
+    <nav>
+      <button class="nav-btn active" data-view="dashboard">Dashboard</button>
+      <button class="nav-btn" data-view="transactions">Transactions</button>
+      <button class="nav-btn" data-view="form" id="nav-add">Add transaction</button>
+    </nav>
+    <button class="ghost side-action" id="seed-btn">Load demo data</button>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <button class="menu-btn" id="menu-btn" aria-label="Open menu">Menu</button>
+      <h2 id="view-title">Dashboard</h2>
+      <button class="primary" id="top-add">Add transaction</button>
+    </header>
+
+    <!-- DASHBOARD -->
+    <section class="view active" id="view-dashboard">
+      <div class="stats">
+        <div class="stat balance">
+          <span class="label">Current balance</span>
+          <strong id="s-balance">–</strong>
+          <span class="hint" id="s-count">0 transactions</span>
+        </div>
+        <div class="stat"><span class="label">Total income</span><strong class="income" id="s-income">–</strong></div>
+        <div class="stat"><span class="label">Total expenses</span><strong class="expense" id="s-expense">–</strong></div>
+        <div class="stat"><span class="label">Transactions</span><strong id="s-tx">–</strong></div>
+      </div>
+
+      <div class="charts">
+        <div class="panel"><h3>Spending by category</h3><div class="chart-box"><canvas id="cat-chart"></canvas></div><p class="empty" id="cat-empty" hidden>No expenses yet.</p></div>
+        <div class="panel"><h3>Monthly expenses</h3><div class="chart-box"><canvas id="month-chart"></canvas></div><p class="empty" id="month-empty" hidden>No expenses yet.</p></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head"><h3>Recent transactions</h3><button class="link" data-view="transactions">View all</button></div>
+        <ul class="recent" id="recent-list"></ul>
+      </div>
+    </section>
+
+    <!-- TRANSACTIONS -->
+    <section class="view" id="view-transactions">
+      <div class="panel">
+        <div class="filters">
+          <label class="grow">Search<input type="search" id="f-search" placeholder="Description or category"></label>
+          <label>Type
+            <select id="f-type"><option value="">All</option><option value="income">Income</option><option value="expense">Expense</option></select>
+          </label>
+          <label>Category<select id="f-category"><option value="">All</option></select></label>
+          <label>From<input type="date" id="f-start"></label>
+          <label>To<input type="date" id="f-end"></label>
+          <button class="ghost" id="f-clear">Clear</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Date</th><th>Type</th><th>Category</th><th>Description</th><th class="num">Amount</th><th class="actions-col">Actions</th></tr></thead>
+            <tbody id="tx-body"></tbody>
+          </table>
+        </div>
+        <p class="empty" id="tx-empty" hidden>No transactions match. Adjust the filters or add a new one.</p>
+      </div>
+    </section>
+
+    <!-- FORM -->
+    <section class="view" id="view-form">
+      <div class="panel form-panel">
+        <h3 id="form-title">Add transaction</h3>
+        <form id="tx-form" novalidate>
+          <input type="hidden" id="tx-id">
+          <div class="seg" role="radiogroup" aria-label="Transaction type">
+            <input type="radio" name="type" id="t-expense" value="expense" checked><label for="t-expense">Expense</label>
+            <input type="radio" name="type" id="t-income" value="income"><label for="t-income">Income</label>
+          </div>
+          <div class="row">
+            <label>Amount (₹)<input type="number" id="amount" step="0.01" min="0.01" placeholder="0.00"><small class="err" id="err-amount"></small></label>
+            <label>Date<input type="date" id="date"><small class="err" id="err-date"></small></label>
+          </div>
+          <label>Category<select id="category"></select><small class="err" id="err-category"></small></label>
+          <label>Description<input type="text" id="description" maxlength="200" placeholder="What was this for?"><small class="err" id="err-description"></small></label>
+          <div class="form-actions">
+            <button type="submit" class="primary" id="save-btn">Save transaction</button>
+            <button type="button" class="ghost" id="cancel-btn">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </section>
+  </div>
+
+  <dialog id="confirm-dialog">
+    <h3>Delete this transaction?</h3>
+    <p id="confirm-text"></p>
+    <div class="form-actions">
+      <button class="danger" id="confirm-yes">Delete</button>
+      <button class="ghost" id="confirm-no">Keep it</button>
+    </div>
+  </dialog>
+
+  <div id="toasts" aria-live="polite"></div>
+
+  <script src="{{ url_for('static', filename='js/vendor/chart.umd.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>

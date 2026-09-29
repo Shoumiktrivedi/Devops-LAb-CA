@@ -1,0 +1,21 @@
+services:
+  web:
+    build: .
+    container_name: expense-tracker
+    ports:
+      - "5000:5000"
+    environment:
+      DATABASE_URL: sqlite:////data/expenses.db
+      SECRET_KEY: ${SECRET_KEY:-change-me-in-real-deployments}
+      SEED_ON_START: ${SEED_ON_START:-true}
+    volumes:
+      - expense_data:/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:5000/api/health')"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+volumes:
+  expense_data:
